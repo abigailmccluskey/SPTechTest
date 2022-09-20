@@ -15,18 +15,17 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.sp_techtest.model.Album
 import com.example.sp_techtest.ui.theme.SPTechTestTheme
 import com.example.sp_techtest.viewmodel.AlbumViewModel
-import android.util.Log
-import kotlin.math.log
+import dagger.hilt.android.AndroidEntryPoint
 
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    val albumVM by viewModels<AlbumViewModel>()
+    private val viewModel by viewModels<AlbumViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -36,8 +35,16 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    AlbumList(albumList = albumVM.albumList)
-                    albumVM.getAlbumList()
+                    LazyColumn {
+                        itemsIndexed(items = viewModel.albumList) { _, item ->
+                            AlbumItem(
+                                modifier = Modifier.padding(
+                                    horizontal = 8.dp,
+                                    vertical = 4.dp
+                                ), album = item
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -45,31 +52,20 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun AlbumList(albumList: List<Album>) {
-    LazyColumn {
-        itemsIndexed(items = albumList) { index, item ->
-            AlbumItem(album = item)
-        }
-    }
-}
-
-@Composable
-fun AlbumItem(album: Album) {
+fun AlbumItem(modifier: Modifier = Modifier, album: Album) {
     Card(
-        modifier = Modifier
-            .padding(8.dp, 4.dp)
+        modifier = modifier
             .fillMaxWidth()
-            .height(50.dp), shape = RoundedCornerShape(8.dp), elevation = 4.dp
+            .wrapContentHeight(),
+        shape = RoundedCornerShape(8.dp), elevation = 4.dp
     ) {
-        Surface(color = Color.White) {
-            Column(
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxHeight()
-            ) {
-                Text(text = "${album.title}")
-            }
+        Column(
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxHeight()
+        ) {
+            Text(text = album.title)
         }
     }
 }

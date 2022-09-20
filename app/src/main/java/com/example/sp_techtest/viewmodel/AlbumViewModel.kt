@@ -6,19 +6,23 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sp_techtest.model.Album
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AlbumViewModel : ViewModel() {
-    var albumList:List<Album> by mutableStateOf(listOf())
+@HiltViewModel
+class AlbumViewModel @Inject constructor(
+    private val apiService: AlbumAPIService
+) : ViewModel() {
+
+    var albumList: List<Album> by mutableStateOf(listOf())
     var errorMessage: String by mutableStateOf("")
-    fun getAlbumList() {
+
+    init {
         viewModelScope.launch {
-            val apiService = AlbumAPIService.getInstance().create(AlbumAPIService::class.java)
             try {
-                var albumResponse = apiService.getAlbums().sortedByDescending { it.title }
-                albumList = albumResponse.reversed()
-            }
-            catch (e: Exception) {
+                albumList = apiService.getAlbums().sortedBy { it.title }
+            } catch (e: Exception) {
                 errorMessage = e.message.toString()
             }
         }
