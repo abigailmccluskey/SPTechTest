@@ -15,7 +15,8 @@ class AlbumViewModel : ViewModel() {
         viewModelScope.launch {
             val apiService = AlbumAPIService.getInstance().create(AlbumAPIService::class.java)
             try {
-                albumList = apiService.getAlbums()
+                var albumResponse = apiService.getAlbums().sortedByDescending { it.title }
+                albumList = albumResponse.reversed()
             }
             catch (e: Exception) {
                 errorMessage = e.message.toString()
