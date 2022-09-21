@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.sp_techtest.model.Album
+import com.example.sp_techtest.model.AlbumApiModel
 import com.example.sp_techtest.ui.theme.SPTechTestTheme
 import com.example.sp_techtest.viewmodel.AlbumViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -24,33 +25,30 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val viewModel by viewModels<AlbumViewModel>()
+    private val viewModel by viewModels<AlbumViewModel>() //Viewmodel instance
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             SPTechTestTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    if (viewModel.albumList.isEmpty()) {
-                        if(viewModel.errorMessage.isBlank()){
+                    if (viewModel.albumList.isEmpty()) { //Checks if album contains no elements
+                        if (viewModel.errorMessage.isBlank()) {
+                            //If there are no elements check if there is an error message
+                            //If not assume we are still retrieving the data and display loading message
                             Text(text = "Retrieving data...", modifier = Modifier.padding(8.dp))
-                        }else{
-                            Text(text = "API Error: ${viewModel.errorMessage}", modifier = Modifier.padding(8.dp))
+                        } else {
+                            //If there is an error message, display it
+                            Text(
+                                text = "API Error: ${viewModel.errorMessage}",
+                                modifier = Modifier.padding(8.dp)
+                            )
                         }
-                    } else {
-                        LazyColumn {
-                            itemsIndexed(items = viewModel.albumList) { _, item ->
-                                AlbumItem(
-                                    modifier = Modifier.padding(
-                                        horizontal = 8.dp,
-                                        vertical = 4.dp
-                                    ), album = item
-                                )
-                            }
-                        }
+                    } else { //Else display list of elements
+                        AlbumList(albumList = viewModel.albumList)
+
                     }
 
                 }
@@ -60,10 +58,26 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun AlbumItem(modifier: Modifier = Modifier, album: Album) {
+fun AlbumList(albumList: List<Album>) {
+    LazyColumn {
+        itemsIndexed(albumList) { _, item ->
+            AlbumItem(
+                album = item
+            )
+        }
+    }
+}
+
+@Composable
+fun AlbumItem(album: Album) {
+    //Single album item
     Card(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
+            .padding(
+                horizontal = 8.dp,
+                vertical = 4.dp
+            )
             .wrapContentHeight(),
         shape = RoundedCornerShape(8.dp), elevation = 4.dp
     ) {
@@ -81,10 +95,6 @@ fun AlbumItem(modifier: Modifier = Modifier, album: Album) {
 @Preview(showBackground = true)
 @Composable
 fun AlbumPreview() {
-    val album = Album(
-        1,
-        1,
-        "My Beautiful Dark Twisted Fantasy",
-    )
+    val album = Album("My Beautiful Dark Twisted Fantasy")
     AlbumItem(album = album)
 }
