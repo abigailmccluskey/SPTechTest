@@ -1,5 +1,6 @@
 package com.example.sp_techtest.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -23,6 +24,7 @@ class AlbumViewModel @Inject constructor(
             try {
                 albumList = apiService.getAlbums().sortedBy { it.title }
             } catch (e: Exception) {
+                Log.d("TAG", e.message.toString())
                 errorMessage = e.message.toString()
             }
         }

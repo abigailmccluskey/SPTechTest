@@ -1,7 +1,6 @@
 package com.example.sp_techtest
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -15,7 +14,6 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.sp_techtest.model.Album
@@ -37,7 +35,11 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     if (viewModel.albumList.isEmpty()) {
-                        Text(text = "Retrieving data...", modifier = Modifier.padding(8.dp))
+                        if(viewModel.errorMessage.isBlank()){
+                            Text(text = "Retrieving data...", modifier = Modifier.padding(8.dp))
+                        }else{
+                            Text(text = "API Error: ${viewModel.errorMessage}", modifier = Modifier.padding(8.dp))
+                        }
                     } else {
                         LazyColumn {
                             itemsIndexed(items = viewModel.albumList) { _, item ->
