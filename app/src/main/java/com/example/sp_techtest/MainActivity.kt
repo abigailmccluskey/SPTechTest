@@ -1,6 +1,7 @@
 package com.example.sp_techtest
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -35,16 +36,21 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    LazyColumn {
-                        itemsIndexed(items = viewModel.albumList) { _, item ->
-                            AlbumItem(
-                                modifier = Modifier.padding(
-                                    horizontal = 8.dp,
-                                    vertical = 4.dp
-                                ), album = item
-                            )
+                    if (viewModel.albumList.isEmpty()) {
+                        Text(text = "Retrieving data...", modifier = Modifier.padding(8.dp))
+                    } else {
+                        LazyColumn {
+                            itemsIndexed(items = viewModel.albumList) { _, item ->
+                                AlbumItem(
+                                    modifier = Modifier.padding(
+                                        horizontal = 8.dp,
+                                        vertical = 4.dp
+                                    ), album = item
+                                )
+                            }
                         }
                     }
+
                 }
             }
         }
